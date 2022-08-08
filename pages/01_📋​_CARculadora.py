@@ -101,7 +101,7 @@ if len(lista_anos)==0: # Os anos do modelo não foram consultados
         lista_anos = df_anos.loc[(df_anos['Marca']==marca)&(df_anos['Modelo']==modelo.upper())]
         na_fipe = True
     except:
-        st.markdown('O modelo não foi encontrado na tabela Fipe')
+        st.markdown('O modelo não foi encontrado na Tabela Fipe')
 else: # Os anos do modelo já foram consultados 
     na_fipe = True
 
@@ -119,7 +119,7 @@ if na_fipe:
         combustivel = 'Flex' if flex else combustivel
         df['Combustivel'] = combustivel
 
-    st.markdown('A tabela Fipe termina aqui. Mas a gente pode te oferecer uma previsão ainda melhor com as informações abaixo!')
+    st.markdown('A Tabela Fipe termina aqui. Mas a gente pode te oferecer uma previsão ainda melhor com as informações abaixo!')
     
     tipo = st.radio('Tipo de carroceria', lista_tipos, horizontal=True)
     df['Tipo'] = tipo
@@ -243,7 +243,7 @@ if na_fipe:
                 preco_fipe = df_precos.loc[df_precos['ChaveFipe']==chave_fipe]['PrecoFipe'].values[0]
                 df['PrecoFipe'] = float(preco_fipe.split(' ')[1].replace('.', '').replace(',', '.'))
             except:
-                st.markdown('O modelo não foi encontrado na tabela Fipe')
+                st.markdown('O modelo não foi encontrado na Tabela Fipe')
 
         df['PrecoFipeLog'] = np.log(df['PrecoFipe'])
         df['PrecoFipeAjustado'] = df['PrecoFipe']*(1+df['DifMarca']+df['DifTipo']+df['DifAno']+df['DifPotencia']+df['DifNumOpcionais']+df['DifCombustivel']+df['DifDirecao']+df['DifUF'])
