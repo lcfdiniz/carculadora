@@ -10,6 +10,16 @@ from quantile_forest import RandomForestQuantileRegressor
 import bridge
 import json
 
+@st.cache(allow_output_mutation=True, show_spinner=False)
+def train_data():
+    data = pd.read_csv('data/cars_data_streamlit.csv')
+    y = data['Preco']
+    X = data.drop('Preco', axis=1)
+    model = RandomForestQuantileRegressor(n_estimators=300, max_depth=10, min_samples_split=3, max_features=0.5, random_state=42)
+    model.fit(X, y)
+
+    return model
+
 with st.spinner('Aquecendo os motores...'):
     user_agent_list = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15',
@@ -95,9 +105,7 @@ if len(lista_anos)==0: # Os anos do modelo não foram consultados
         df_ano['CodMarca'] = cod_marca
         df_ano['Modelo'] = modelo.upper()
         df_ano['CodModelo'] = cod_modelo
-        df_anos = df_anos.append(df_ano, ignore_index=True)
-        #df_anos.to_csv('data/anos_fipe.csv', index=False) # Retirar caso não seja possível salvar arquivos
-        
+        df_anos = df_anos.append(df_ano, ignore_index=True)        
         lista_anos = df_anos.loc[(df_anos['Marca']==marca)&(df_anos['Modelo']==modelo.upper())]
         na_fipe = True
     except:
@@ -239,7 +247,6 @@ if na_fipe:
                 source_preco = requests.get(url_preco, headers=headers, timeout=random.randint(5,10))
                 preco = source_preco.json()['Valor']
                 df_precos = df_precos.append({'CodMarca': cod_marca, 'CodModelo': cod_modelo, 'CodAno': cod_ano, 'PrecoFipe': preco, 'ChaveFipe': str(cod_marca) + ' ' + str(cod_modelo) + ' ' + cod_ano}, ignore_index=True)
-                #df_precos.to_csv('data/preco_fipe.csv', index=False)  # Retirar caso não seja possível salvar arquivos
                 preco_fipe = df_precos.loc[df_precos['ChaveFipe']==chave_fipe]['PrecoFipe'].values[0]
                 df['PrecoFipe'] = float(preco_fipe.split(' ')[1].replace('.', '').replace(',', '.'))
             except:
@@ -247,9 +254,6 @@ if na_fipe:
 
         df['PrecoFipeLog'] = np.log(df['PrecoFipe'])
         df['PrecoFipeAjustado'] = df['PrecoFipe']*(1+df['DifMarca']+df['DifTipo']+df['DifAno']+df['DifPotencia']+df['DifNumOpcionais']+df['DifCombustivel']+df['DifDirecao']+df['DifUF'])
-
-        bridge.df = df
-        bridge.button_click = True
 
         lista_drop = ['Marca', 'Tipo', 'Ano', 'Potencia', 'Portas', 'Modelo', 'Dias', 'KmLimite']
         for var in lista_drop:
@@ -266,7 +270,8 @@ if na_fipe:
         X = X.drop(var_ohe, axis=1)
 
         # Random Forest Quantile Regression
-        rfqr = pickle.load(open('data/rfqr.pkl', 'rb'))
+        with st.spinner('Aquecendo os motores...'):
+            rfqr = train_data()
         y_pred = rfqr.predict(X, quantiles=[0.05, 0.5, 0.95])
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -284,3 +289,8 @@ if na_fipe:
             st.markdown('<span style="color:red">**Máximo**</span>', True)
             preco_max = 'R$ ' + str(round(y_pred[0][2],2)).replace('.',',')
             st.subheader(preco_max)
+        
+        # Envia os dados para análise
+        bridge.df = df
+        bridge.button_click = True
+        bridge.model = rfqr

@@ -16,7 +16,6 @@ if bridge.button_click:
     st.markdown('Aqui está a previsão do modelo para os próximos doze meses! **Mas fique atento**:')
     st.caption('- O processo inflacionário e diversas outras variáveis não são consideradas na análise;')
     st.caption('- Não funciona corretamente em veículos muito antigos.')
-    #st.header('Previsão de preço para os próximos meses')
 
     df = bridge.df
 
@@ -36,7 +35,7 @@ if bridge.button_click:
         X = X.drop(var_ohe, axis=1)
 
         # Random Forest Quantile Regression
-        rfqr = pickle.load(open('data/rfqr.pkl', 'rb'))
+        rfqr = bridge.model
         y_pred = rfqr.predict(X, quantiles=[0.05, 0.5, 0.95])
 
         df_precos = df_precos.append({'PrecoMin': y_pred[0][0], 'PrecoMed': y_pred[0][1], 'PrecoMax': y_pred[0][2]}, ignore_index=True)

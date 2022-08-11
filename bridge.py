@@ -4,5 +4,5 @@ df = dict.fromkeys(['Marca', 'Tipo', 'Ano', 'UF', 'Km', 'Potencia',
        'TravaEletrica', 'VidroEletrico', 'Som', 'SensorDeRe', 'CameraDeRe',
        'Blindado', 'Modelo', 'Dias', 'KmLimite', 'KmPorDias',
        'NumOpcionais', 'KmSqrt', 'PotenciaNum', 'PrecoFipe', 'DifAnosFipe'])
-
 button_click = False
+model = []
