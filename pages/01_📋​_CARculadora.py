@@ -7,7 +7,7 @@ import requests
 import pickle
 from sklearn.preprocessing import OneHotEncoder
 from quantile_forest import RandomForestQuantileRegressor
-import bridge
+import src.bridge as bridge
 import json
 
 @st.cache(allow_output_mutation=True, show_spinner=False)

@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 from sklearn.preprocessing import OneHotEncoder
 from quantile_forest import RandomForestQuantileRegressor
-import bridge
+import src.bridge as bridge
 
 df_precos = pd.DataFrame(columns=['PrecoMin', 'PrecoMed', 'PrecoMax'])
 
